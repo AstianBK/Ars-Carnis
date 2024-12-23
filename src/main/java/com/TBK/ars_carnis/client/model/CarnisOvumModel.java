@@ -20,7 +20,7 @@ import net.minecraft.world.entity.HumanoidArm;
 
 public class CarnisOvumModel<T extends CarnisOvumEntity> extends HierarchicalModel<T> implements ArmedModel {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(ArsCarnis.MODID, "larva_carnis"), "root");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(ArsCarnis.MODID, "carnis_ovum_spina"), "root");
 	private final ModelPart main;
 	private final ModelPart head;
 	private final ModelPart leftArm;

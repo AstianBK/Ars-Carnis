@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public class CarnisOvumEntityRenderer<T extends CarnisOvumEntity,M extends CarnisOvumModel<T>> extends MobRenderer<T,M> {
-    public final ResourceLocation TEXTURE = new ResourceLocation(ArsCarnis.MODID,"textures/entity/larva_carnis.png");
+    public final ResourceLocation TEXTURE = new ResourceLocation(ArsCarnis.MODID,"textures/entity/carnis_ovum_spina.png");
     public CarnisOvumEntityRenderer(EntityRendererProvider.Context p_174304_) {
         super(p_174304_, (M) new CarnisOvumModel<>(p_174304_.bakeLayer(CarnisOvumModel.LAYER_LOCATION)), 0.0F);
         this.addLayer(new ItemInHandLayer<>(this,p_174304_.getItemInHandRenderer()));

@@ -104,7 +104,7 @@ public class ModBusEvent {
             CarnisPlayerCapability cap = ACCapability.getEntityVam(event.getEntity(), CarnisPlayerCapability.class);
             if(cap!=null){
                 boolean isVampire=cap.isCarnis();
-                event.getEntity().sendSystemMessage(Component.nullToEmpty(cap.isCarnis() ?  "Te convertiste en humano OmegaGigaChad" :"Te convertiste en Vampiro Cuck" ));
+                event.getEntity().sendSystemMessage(Component.nullToEmpty(cap.isCarnis() ?  "Te convertiste en Humano Cuck" :"Te convertiste en Mutante Gigachad" ));
                 cap.convert(isVampire);
             }
         }else if(stack.is(Items.STICK) && event.getEntity().isShiftKeyDown()){

@@ -1,0 +1,15 @@
+{
+  "type": "ars_carnis:incubation_recipe",
+  "nutrition1": {
+    "item": "minecraft:iron_ingot",
+    "count": 2
+  },
+  "nutrition2": {
+    "item": "minecraft:iron_ingot"
+  },
+  "nutrition3": {
+    "item": "minecraft:gold_ingot"
+  },
+  "experience": 10,
+  "incubation_time": 500
+}

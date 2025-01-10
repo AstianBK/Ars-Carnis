@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,43 +24,34 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerRenderer.class)
 public class FirstPersonRendererMixin {
-    private ArmCarnisModel<?> modelLeft;
-    private ArmCarnisModel<?> modelRight;
+    private ArmCarnisModel<Player> modelLeft;
+    private ArmCarnisModel<Player> modelRight;
 
     private final ResourceLocation TEXTURE = new ResourceLocation(ArsCarnis.MODID,"textures/part_upgrade/arms/arm_spike.png");
 
-    @Inject(method = "renderRightHand",at = @At("TAIL"),cancellable = true)
+    @Inject(method = "renderRightHand",at = @At("HEAD"),cancellable = true)
     private void cancelRenderHandR(PoseStack p_117771_, MultiBufferSource p_117772_, int p_117773_, AbstractClientPlayer p_117774_, CallbackInfo ci){
-        if(SkillPlayerCapability.get(p_117774_).getHotBarSkill().getForName("spike") instanceof ArmsSpike armsSpike && armsSpike.arm== ArmsAbstract.Arm.RIGHT){
+        if(SkillPlayerCapability.get(p_117774_).getHotBarSkill().getForName("spike_right") instanceof ArmsSpike armsSpike){
             if( ((Object)this) instanceof LivingEntityRenderer<?,?> renderer && renderer.getModel() instanceof PlayerModel playerModel){
-                int duration=SkillPlayerCapability.get(p_117774_).getActiveEffectDuration().getRemainingDurationsForSkill("spike");
-                float tick=(float) duration/5.0F;
+                float partialTicks=Minecraft.getInstance().getPartialTick();
+
                 if(modelRight==null){
                     this.modelRight=new ArmCarnisModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ArmCarnisModel.LAYER_LOCATION));
                 }
+
                 RenderType renderType=RenderType.entityTranslucent(TEXTURE);
-                p_117771_.pushPose();
-                modelRight.copyOfLimbs(playerModel.leftArm);
-                playerModel.setAllVisible(false);
-                //p_117771_.translate(-1F,0.0F,0.0F);
-                p_117771_.mulPose(Axis.XP.rotation(30.0F*tick));
-                p_117771_.scale(1.1F,1.1F,1.1F);
+                modelRight.setupAnim((Player)p_117774_,0.0F,0.0F,p_117774_.tickCount+partialTicks,0.0F,0.0F);
                 modelRight.renderToBuffer(p_117771_,p_117772_.getBuffer(renderType),p_117773_, OverlayTexture.NO_OVERLAY,1.0F,1.0F,1.0F,1.0F);
-                p_117771_.popPose();
+                ci.cancel();
             }
         }
     }
 
     @Inject(method = "renderLeftHand",at = @At("HEAD"),cancellable = true)
     private void cancelRenderHandL(PoseStack p_117771_, MultiBufferSource p_117772_, int p_117773_, AbstractClientPlayer p_117774_, CallbackInfo ci){
-        if(SkillPlayerCapability.get(p_117774_).getHotBarSkill().getForName("spike") instanceof ArmsSpike armsSpike && armsSpike.arm== ArmsAbstract.Arm.LEFT){
+        if(SkillPlayerCapability.get(p_117774_).getHotBarSkill().getForName("spike_left") instanceof ArmsSpike armsSpike){
             if( ((Object)this) instanceof LivingEntityRenderer<?,?> renderer && renderer.getModel() instanceof PlayerModel playerModel){
-                int duration = SkillPlayerCapability.get(p_117774_).getActiveEffectDuration().getRemainingDurationsForSkill("spike");
                 float partialTicks=Minecraft.getInstance().getPartialTick();
-                float normalizedDuration = 1.0F - ((float)duration / 5F);
-                normalizedDuration += partialTicks / 1500.0F;
-                normalizedDuration=Mth.clamp(normalizedDuration,0.0F,1.0F);
-                float tick = easeIn(normalizedDuration);
 
                 if(modelLeft==null){
                     this.modelLeft=new ArmCarnisModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ArmCarnisModel.LAYER_LOCATION));
@@ -68,18 +59,7 @@ public class FirstPersonRendererMixin {
                 RenderType renderType = RenderType.entityTranslucent(TEXTURE);
 
                 //model1.copyOfLimbs(playerModel.leftArm);
-                if(duration>0){
-                    //ArsCarnis.LOGGER.debug("Xrot :" + playerModel.leftArm.xRot + " y :"+playerModel.leftArm.y + "z :"+playerModel.leftArm.z);
-                    modelLeft.leftArm.xRot =  Mth.lerp(tick,  -(float) (Math.PI/4),(float) Math.PI);
-                    modelLeft.leftArm.y = Mth.lerp(tick, 10 + 3.0F, 10);
-                    modelLeft.leftArm.z = Mth.lerp(tick, 5 - 10.0F, 5);
-                    ArsCarnis.LOGGER.debug("Xrot :" + modelLeft.leftArm.xRot + " y :"+modelLeft.leftArm.y + "z :"+modelLeft.leftArm.z);
-                }else {
-                    modelLeft.leftArm.xRot = -(float) (Math.PI/4);
-                    modelLeft.leftArm.y = 10;
-                    modelLeft.leftArm.z = 5;
-
-                }
+                modelLeft.setupAnim((Player)p_117774_,0.0F,0.0F,p_117774_.tickCount+partialTicks,0.0F,0.0F);
                 modelLeft.renderToBuffer(p_117771_, p_117772_.getBuffer(renderType), p_117773_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
                 ci.cancel();
             }

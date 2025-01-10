@@ -1,13 +1,14 @@
 package com.TBK.ars_carnis;
 
 import com.TBK.ars_carnis.client.ClientProxy;
+import com.TBK.ars_carnis.client.gui.IncubationTubeScreenMenu;
 import com.TBK.ars_carnis.client.renderer.CarnisOvumEntityRenderer;
 import com.TBK.ars_carnis.client.renderer.CarnisSpinaEntityRenderer;
 import com.TBK.ars_carnis.common.Proxy;
-import com.TBK.ars_carnis.common.registry.ACEntityType;
-import com.TBK.ars_carnis.common.registry.ACSkillAbstract;
+import com.TBK.ars_carnis.common.registry.*;
 import com.TBK.ars_carnis.server.network.PacketHandler;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -37,7 +38,14 @@ public class ArsCarnis
 
         MinecraftForge.EVENT_BUS.register(this);
         ACEntityType.ENTITY_TYPES.register(modEventBus);
+        ACBlocks.BLOCKS.register(modEventBus);
+        ACBlockEntity.BLOCKS_ENTITY.register(modEventBus);
+        ACItems.ITEMS.register(modEventBus);
+        ACMenuType.MENU_TYPE.register(modEventBus);
+        ACRecipeSerializer.RECIPE_SERIALIZERS.register(modEventBus);
+        ACRecipeSerializer.RECIPE_TYPES.register(modEventBus);
         ACSkillAbstract.init();
+        ACCreativeTabs.TABS.register(modEventBus);
         PacketHandler.registerMessages();
         modEventBus.addListener(this::clientSetup);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT,()->()->{
@@ -46,11 +54,15 @@ public class ArsCarnis
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
+
     @OnlyIn(Dist.CLIENT)
     private void registerRenderers(FMLCommonSetupEvent event){
         EntityRenderers.register(ACEntityType.CARNIS_OVUM.get(), CarnisOvumEntityRenderer::new);
         EntityRenderers.register(ACEntityType.CARNIS_SPINA.get(), CarnisSpinaEntityRenderer::new);
+        MenuScreens.register(ACMenuType.FURNACE_MENU.get(), IncubationTubeScreenMenu::new);
     }
+
+
     private void clientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> PROXY.init());
     }

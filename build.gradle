@@ -87,7 +87,6 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
     maven { url 'https://jitpack.io' }
     maven {
         url 'https://www.cursemaven.com'
@@ -100,7 +99,6 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.4")
     implementation 'com.github.marcoacierno:pastebin-java-api:0.2.1'
 }
 

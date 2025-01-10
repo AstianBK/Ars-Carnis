@@ -32,16 +32,11 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
-    public final AnimatableInstanceCache cache= GeckoLibUtil.createInstanceCache(this);
+public class SkillPlayerCapability implements ISkillPlayer {
     public PartAbstract lastUsingSkillAbstract= PartAbstract.NONE;
     Player player;
     Level level;
@@ -85,7 +80,7 @@ public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
     }
 
     public boolean isVampire(){
-        return this.getPlayerVampire().isCarnis();
+        return true;//this.getPlayerVampire().isCarnis();
     }
 
     @Override
@@ -134,6 +129,22 @@ public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
         return this.lastUsingSkillAbstract;
     }
 
+    public ArmsAbstract getArmLeft(){
+        return this.skills.get(0) instanceof ArmsAbstract ? (ArmsAbstract) this.skills.get(0) : null;
+    }
+
+    public ArmsAbstract getArmRight(){
+        return this.skills.get(1) instanceof ArmsAbstract ? (ArmsAbstract) this.skills.get(1) : null;
+    }
+
+    public boolean hasArmLeftUpgrade(){
+        return this.getArmLeft()!=null;
+    }
+
+    public boolean hasArmRightUpgrade(){
+        return this.getArmRight()!=null;
+    }
+
     @Override
     public void setLastUsingSkill(PartAbstract power) {
         this.lastUsingSkillAbstract=power;
@@ -160,7 +171,8 @@ public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
             }
             if(!this.skills.getSkills().isEmpty()){
                 this.skills.getSkills().forEach(e->{
-                    if(this.durationEffect.hasDurationForSkill(e.getSkillAbstract())){
+
+                    if(this.durationEffect.hasDurationForSkill(e.getSkillAbstract().name)){
                         e.getSkillAbstract().tick(this);
                         this.durationEffect.decrementDurationCount(e.getSkillAbstract());
                     }
@@ -191,6 +203,7 @@ public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
     public void onJoinGame(Player player, EntityJoinLevelEvent event) {
         SkillAbstracts skillAbstracts=new SkillAbstracts(new HashMap<>());
         skillAbstracts.addSkillAbstracts(0,new ArmsSpike().setArm(ArmsAbstract.Arm.LEFT));
+        skillAbstracts.addSkillAbstracts(1,new ArmsSpike().setArm(ArmsAbstract.Arm.RIGHT));
         /*skillAbstracts.addSkillAbstracts(0,new BatForm());
         skillAbstracts.addSkillAbstracts(1,new BloodOrb());
         skillAbstracts.addSkillAbstracts(2,new BloodSlash());
@@ -387,20 +400,11 @@ public class SkillPlayerCapability implements ISkillPlayer, GeoEntity {
         this.durationEffect=activeEffectDuration;
     }
 
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
 
-    }
 
     public <P extends SkillPlayerCapability> P getPatch(LivingEntity replaced, Class<P> pClass){
         return ACCapability.getEntityCap(replaced,pClass);
     }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
-    }
-
 
     public static class SkillPlayerProvider implements ICapabilityProvider, ICapabilitySerializable<CompoundTag> {
         private final LazyOptional<ISkillPlayer> instance = LazyOptional.of(SkillPlayerCapability::new);

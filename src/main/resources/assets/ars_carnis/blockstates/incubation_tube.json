@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "facing=north,half=lower": { "model":"ars_carnis:block/incubation_lower" },
+    "facing=east,half=lower": { "model":"ars_carnis:block/incubation_lower", "y": 90 },
+    "facing=south,half=lower": { "model":"ars_carnis:block/incubation_lower", "y": 180 },
+    "facing=west,half=lower": { "model":"ars_carnis:block/incubation_lower", "y": 270 },
+
+    "facing=north,half=upper": { "model":"ars_carnis:block/incubation_upper" },
+    "facing=east,half=upper": { "model":"ars_carnis:block/incubation_upper", "y": 90 },
+    "facing=south,half=upper": { "model":"ars_carnis:block/incubation_upper", "y": 180 },
+    "facing=west,half=upper": { "model":"ars_carnis:block/incubation_upper", "y": 270 }
+
+  }
+}

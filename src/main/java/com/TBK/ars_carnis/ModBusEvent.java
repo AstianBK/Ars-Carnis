@@ -1,5 +1,6 @@
 package com.TBK.ars_carnis;
 
+import com.TBK.ars_carnis.client.ClientProxy;
 import com.TBK.ars_carnis.client.model.ArmCarnisModel;
 import com.TBK.ars_carnis.common.capability.ACCapability;
 import com.TBK.ars_carnis.common.capability.CarnisPlayerCapability;
@@ -27,6 +28,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -56,47 +58,50 @@ public class ModBusEvent {
     }
     @SubscribeEvent
     public static void renderHand(RenderArmEvent event) {
-        boolean flag = event.getArm() == HumanoidArm.LEFT;
-        float f = flag ? 1.0F : -1.0F;
-        if(SkillPlayerCapability.get(event.getPlayer()).getHotBarSkill().getForName("spike") instanceof ArmsSpike armsSpike && armsSpike.arm == ArmsAbstract.Arm.LEFT){
-            if(event.getArm().equals(HumanoidArm.RIGHT)){
-                event.getPoseStack().pushPose();
-                int duration = SkillPlayerCapability.get(event.getPlayer()).getActiveEffectDuration().getRemainingDurationsForSkill("spike");
-                float partialTicks=Minecraft.getInstance().getPartialTick();
-                float normalizedDuration = 1.0F - ((float)duration / 5F);
-                normalizedDuration += partialTicks / 1500.0F;
-                normalizedDuration= Mth.clamp(normalizedDuration,0.0F,1.0F);
-                float tick = easeIn(normalizedDuration);
+        if(SkillPlayerCapability.get(event.getPlayer()).getHotBarSkill().getForName("spike_left") instanceof ArmsSpike armsSpike){
+            boolean flag = armsSpike.getArm() == ArmsAbstract.Arm.RIGHT;
+            float f = flag ? 1.0F : -1.0F;
 
-                ArmCarnisModel<?> modelLeft=new ArmCarnisModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ArmCarnisModel.LAYER_LOCATION));
+            event.getPoseStack().pushPose();
+            event.getPoseStack().translate(f * 0.125F, -0.125F, 0.0F);
 
-                RenderType renderType = RenderType.entityTranslucent(TEXTURE);
+            float f1 = Mth.sqrt(0.0F);
+            float f2 = -0.3F * Mth.sin(f1 * (float)Math.PI);
+            float f3 = 0.4F * Mth.sin(f1 * ((float)Math.PI * 2F));
+            float f4 = -0.4F * Mth.sin(0.0F * (float)Math.PI);
+            event.getPoseStack().pushPose();
+            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(f * 10.0F));
 
-                //model1.copyOfLimbs(playerModel.leftArm);
-                if(duration>0){
-                    event.getPoseStack().translate(0.0F,0.0f,-2.0f);
-                    //ArsCarnis.LOGGER.debug("Xrot :" + playerModel.leftArm.xRot + " y :"+playerModel.leftArm.y + "z :"+playerModel.leftArm.z);
-                    modelLeft.leftArm.xRot =  Mth.lerp(tick,  -(float) (Math.PI/4),(float) Math.PI);
-                    modelLeft.leftArm.y = Mth.lerp(tick, 10 + 3.0F, 10);
-                    modelLeft.leftArm.z = Mth.lerp(tick, 5 - 10.0F, 5);
-                    ArsCarnis.LOGGER.debug("Xrot :" + modelLeft.leftArm.xRot + " y :"+modelLeft.leftArm.y + "z :"+modelLeft.leftArm.z);
-                }else {
-                    modelLeft.leftArm.xRot = (float) Math.PI;
-                    modelLeft.leftArm.y = 10;
-                    modelLeft.leftArm.z = 5;
-                }
+            event.getPoseStack().translate(f * (f2 + 0.64000005F), f3 + -0.6F + 0.0F * -0.6F, f4 + -0.71999997F);
+            event.getPoseStack().mulPose(Axis.YP.rotationDegrees(f * 45.0F));
+            float f5 = Mth.sin(0.0F * 0.0F * (float)Math.PI);
+            float f6 = Mth.sin(f1 * (float)Math.PI);
+            event.getPoseStack().mulPose(Axis.YP.rotationDegrees(f * f6 * 70.0F));
+            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(f * f5 * -20.0F));
+            event.getPoseStack().translate(f * -1.0F, 3.6F, 3.5F);
+            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(f * 120.0F));
+            event.getPoseStack().mulPose(Axis.XP.rotationDegrees(200.0F));
+            event.getPoseStack().mulPose(Axis.YP.rotationDegrees(f * -135.0F));
+            event.getPoseStack().translate(f * 5.6F, 0.0F, 0.0F);
 
-                modelLeft.renderToBuffer(event.getPoseStack(), event.getMultiBufferSource().getBuffer(renderType), event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-                event.getPoseStack().popPose();
 
-            }
+            event.getPoseStack().translate(0.0F, 0.8F, -1.0F);
+
+
+            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(f * 30.0F));
+
+            float partialTicks=Minecraft.getInstance().getPartialTick();
+            ArmCarnisModel<Player> modelLeft=new ArmCarnisModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ArmCarnisModel.LAYER_LOCATION));
+
+            RenderType renderType = RenderType.entityTranslucent(TEXTURE);
+            modelLeft.setupAnim(event.getPlayer(),0.0F,0.0F,partialTicks+event.getPlayer().tickCount,0.0F,0.0F);
+            modelLeft.renderToBuffer(event.getPoseStack(), event.getMultiBufferSource().getBuffer(renderType), event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            event.getPoseStack().popPose();
+
+            event.getPoseStack().popPose();
         }
-
     }
 
-    private static float easeIn(float t) {
-        return t * t;
-    }
     @SubscribeEvent
     public static void onRightClick(PlayerInteractEvent.RightClickItem event){
         ItemStack stack=event.getEntity().getItemInHand(event.getHand());
@@ -107,7 +112,7 @@ public class ModBusEvent {
                 event.getEntity().sendSystemMessage(Component.nullToEmpty(cap.isCarnis() ?  "Te convertiste en Humano Cuck" :"Te convertiste en Mutante Gigachad" ));
                 cap.convert(isVampire);
             }
-        }else if(stack.is(Items.STICK) && event.getEntity().isShiftKeyDown()){
+        }else if(stack.is(Items.STICK) && event.getEntity().isShiftKeyDown() && event.getEntity().level().isClientSide ){
             CarnisPlayerCapability cap = ACCapability.getEntityVam(event.getEntity(), CarnisPlayerCapability.class);
             if(cap!=null){
                 cap.age++;
@@ -115,15 +120,13 @@ public class ModBusEvent {
             }
         }
 
-        if(stack.is(Items.STICK)){
-            event.getEntity().startUsingItem(InteractionHand.OFF_HAND);
-        }
 
     }
 
     @SubscribeEvent
     public static void onTick(LivingEvent.LivingTickEvent event){
         if(event.getEntity() instanceof Player){
+
             CarnisPlayerCapability vampismo = ACCapability.getEntityVam(event.getEntity(), CarnisPlayerCapability.class);
             SkillPlayerCapability cap = ACCapability.getEntityCap(event.getEntity(), SkillPlayerCapability.class);
             if(cap!=null && event.getEntity().isAlive()){
@@ -132,7 +135,6 @@ public class ModBusEvent {
             if(vampismo!=null && event.getEntity().isAlive() && vampismo.isCarnis()){
                 vampismo.tick((Player) event.getEntity());
             }
-        }else {
         }
     }
 

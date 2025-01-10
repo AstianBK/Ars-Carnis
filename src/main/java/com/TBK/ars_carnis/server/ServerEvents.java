@@ -2,6 +2,7 @@ package com.TBK.ars_carnis.server;
 
 import com.TBK.ars_carnis.ArsCarnis;
 import com.TBK.ars_carnis.common.registry.ACEntityType;
+import com.TBK.ars_carnis.common.registry.ACItemProperties;
 import com.TBK.ars_carnis.server.entity.CarnisOvumEntity;
 import com.TBK.ars_carnis.server.entity.CarnisSpinaEntity;
 import net.minecraft.world.entity.Mob;
@@ -21,7 +22,6 @@ public class ServerEvents {
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Mob::checkMobSpawnRules);
 
-        //event.put(CVNEntityType.ELDER_HARPY.get(), ElderHarpyEntity.setAttributes());
         event.put(ACEntityType.CARNIS_OVUM.get(), CarnisOvumEntity.setAttributes());
         event.put(ACEntityType.CARNIS_SPINA.get(), CarnisSpinaEntity.setAttributes());
 
@@ -29,6 +29,6 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        //event.enqueueWork(BKItemProperties::register);
+        event.enqueueWork(ACItemProperties::register);
     }
 }
